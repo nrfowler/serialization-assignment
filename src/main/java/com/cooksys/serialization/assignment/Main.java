@@ -3,7 +3,12 @@ package com.cooksys.serialization.assignment;
 import com.cooksys.serialization.assignment.model.*;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -16,9 +21,16 @@ public class Main {
      * @param studentContactFile the XML file to use
      * @param jaxb the JAXB context to use
      * @return a {@link Student} object built using the {@link Contact} data in the given file
+     * @throws JAXBException 
      */
-    public static Student readStudent(File studentContactFile, JAXBContext jaxb) {
-        return null; // TODO
+    public static Student readStudent(File studentContactFile, JAXBContext jaxb) throws JAXBException {
+        Unmarshaller unmarshaller=jaxb.createUnmarshaller();
+        Contact contact=(Contact)unmarshaller.unmarshal(studentContactFile);
+        Student student = new Student();
+        student.setContact(contact);
+        return student;
+        
+        
     }
 
     /**
@@ -27,9 +39,15 @@ public class Main {
      * @param studentDirectory the directory of student contact files to use
      * @param jaxb the JAXB context to use
      * @return a list of {@link Student} objects built using the contact files in the given directory
+     * @throws JAXBException 
      */
-    public static List<Student> readStudents(File studentDirectory, JAXBContext jaxb) {
-        return null; // TODO
+    public static List<Student> readStudents(File studentDirectory, JAXBContext jaxb) throws JAXBException {
+    	List<Student> list=new ArrayList<Student>();
+    	File[] files=studentDirectory.listFiles();
+    	for(File file: files){
+    		list.add(readStudent(file,jaxb));
+    	}
+    	return list;
     }
 
     /**
@@ -42,7 +60,18 @@ public class Main {
      * @return an {@link Instructor} object built using the {@link Contact} data in the given file
      */
     public static Instructor readInstructor(File instructorContactFile, JAXBContext jaxb) {
-        return null; // TODO
+    	Unmarshaller unmarshaller;
+    	Contact contact=null;
+		try {
+			unmarshaller = jaxb.createUnmarshaller();
+			contact=(Contact)unmarshaller.unmarshal(instructorContactFile);
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        Instructor inst = new Instructor();
+        inst.setContact(contact);
+		return inst;
     }
 
     /**
@@ -57,7 +86,27 @@ public class Main {
      * @return a {@link Session} object built from the data in the given directory
      */
     public static Session readSession(File rootDirectory, JAXBContext jaxb) {
-        return null; // TODO
+        File[] datefile= rootDirectory.listFiles();
+        File[] stuDir= datefile[0].listFiles();
+        List<Student> students=null;
+        try {
+			students=readStudents(stuDir[0],JAXBContext.newInstance(Student.class));
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        Instructor instructor = new Instructor();
+        try{
+        	instructor=readInstructor(rootDirectory, JAXBContext.newInstance(Instructor.class));
+        }catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        Session session = new Session();
+        session.setStudents(students);
+        session.setInstructor(instructor);
+		return null;
+
     }
 
     /**
@@ -68,7 +117,20 @@ public class Main {
      * @param jaxb the JAXB context to use
      */
     public static void writeSession(Session session, File sessionFile, JAXBContext jaxb) {
-        // TODO
+        Marshaller marshaller = null;
+		try {
+			marshaller = jaxb.createMarshaller();
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        try {
+			marshaller.marshal(session, sessionFile);
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
     }
 
     /**
@@ -98,6 +160,14 @@ public class Main {
      *      </session>
      */
     public static void main(String[] args) {
-        // TODO
+    	Session session = new Session();
+        try {
+			session=readSession(new File("input/memphis/"),JAXBContext.newInstance(Student.class));
+		} catch (JAXBException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    
+    writeSession(session,new File("input/memphis/08-08-2016/students"),JAXBContext.newInstance(Student.class));
     }
 }

@@ -1,7 +1,12 @@
 package com.cooksys.serialization.assignment.model;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+@XmlRootElement
 public class Contact {
+	@XmlAttribute(name="first-name")
     private String firstName;
+	@XmlAttribute(name="last-name")
     private String lastName;
     private String email;
     private String phoneNumber;

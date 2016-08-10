@@ -168,6 +168,11 @@ public class Main {
 			e.printStackTrace();
 		}
     
-    writeSession(session,new File("input/memphis/08-08-2016/students"),JAXBContext.newInstance(Student.class));
+    try {
+		writeSession(session,new File("output/session.xml"),JAXBContext.newInstance(Student.class));
+	} catch (JAXBException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
     }
 }

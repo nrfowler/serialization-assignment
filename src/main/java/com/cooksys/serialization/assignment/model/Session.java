@@ -2,8 +2,13 @@ package com.cooksys.serialization.assignment.model;
 
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+@XmlRootElement
 public class Session {
+	@XmlAttribute
     private String location;
+	@XmlAttribute(name="start-date")
     private String startDate;
     private Instructor instructor;
     private List<Student> students;
